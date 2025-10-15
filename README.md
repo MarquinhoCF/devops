@@ -121,3 +121,97 @@ ping 192.168.56.12
 # Verificar se os pacotes estão sendo transmitidos
 exit
 ```
+
+### Configurando arquivo de inventário do Ansible
+
+```
+cd control-node
+vagrant ssh
+sudo nano /etc/ansible/hosts
+```
+
+Adicionar as linhas abaixo:
+
+```
+[apps]
+app01
+[dbs]
+db01
+```
+
+### Configurando acesso do Control Node aos managed nodes
+
+Criar uma chave ssh:
+
+``` 
+cd control-node
+vagrant ssh
+ssh-keygen
+# Não é necessário passar um path e nem senha
+```
+
+Verificar se a chave ssh foi criada corretamente
+
+```
+ls -lha
+cd ~/.ssh/
+ls
+```
+
+Copiar valor da chave ssh pública:
+
+```
+cat id_rsa.pub
+```
+
+Adicionar a chave pública no proviosionamento do App01 e Db01:
+
+Adicionando o arquivo `provision.sh`:
+
+```
+cat <<EOT | sudo tee -a /home/vagrant/.ssh/authorized_keys
+ssh-rsa <SUA_CHAVE> = vagrant@control-node
+EOT
+```
+
+Adicionar a linha no Vagrantfile do App01 e Db01:
+
+```
+config.vm.provision "shell", path: "provision.sh"
+```
+
+E reiniciar e forçar o provisionamento das VM:
+
+``` 
+vagrant provision
+
+```
+
+Teste tentando acessar as VMs App01 e Db01 a partir do Control Node:
+
+```
+ssh vagrant@app01
+ssh vagrant@db01
+```
+
+E depois tente:
+
+```
+ansible -m ping all
+```
+
+#### Troubleshotting
+
+Caso seja necessário destrua a máquina antiga e inicie outra:
+
+```
+vagrant destroy -f
+vagrant up
+```
+
+Caso você esbarre no problema de ataque *man-in-the-middle*. No é o nosso caso, não é um ataque, é só que o Vagrant recriou a VM, então a chave pública dela mudou.
+
+```
+ssh-keygen -f "/home/vagrant/.ssh/known_hosts" -R "db01" # Ou app01
+ssh vagrant@db01 # Ou app01
+```
