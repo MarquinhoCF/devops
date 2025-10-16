@@ -37,6 +37,87 @@ vagrant ssh
 exit # Para sair da VM
 ```
 
+## 🧰 Comandos principais do Vagrant
+
+### 💤 **1️⃣ Suspender (pausar o estado atual)**
+
+```bash
+vagrant suspend
+```
+
+* Salva o estado atual da VM (RAM, CPU, etc) em disco.
+* Retoma rápido depois com:
+
+  ```bash
+  vagrant resume
+  ```
+
+✅ Ideal se você quer **voltar exatamente de onde parou**.
+
+---
+
+### ⚙️ **2️⃣ Desligar (shutdown limpo do SO)**
+
+```bash
+vagrant halt
+```
+
+* Envia um **`shutdown -h now`** para a VM.
+* Mantém os discos e o estado da VM intactos.
+* Depois você pode ligá-la novamente com:
+
+  ```bash
+  vagrant up
+  ```
+
+✅ É o jeito mais comum e seguro de **parar uma VM** sem perder nada.
+
+---
+
+### 💣 **3️⃣ Destruir (apagar completamente a VM)**
+
+```bash
+vagrant destroy
+```
+
+* Desliga e **remove completamente** a VM do VirtualBox (ou outro provider).
+* Você perde tudo dentro da VM (mas seus playbooks, arquivos locais etc. continuam na pasta do host).
+  ✅ Use quando quiser **recriar o ambiente do zero**.
+
+---
+
+### 🧱 **4️⃣ Forçar parada imediata (caso trave)**
+
+```bash
+vagrant halt -f
+```
+
+ou
+
+```bash
+vagrant destroy -f
+```
+
+* **Força** o desligamento sem esperar resposta do sistema.
+  ⚠️ Pode corromper o estado se estiver gravando no disco, então use só se a VM travar.
+
+---
+
+### 🧩 **5️⃣ Ver o status das VMs**
+
+```bash
+vagrant status
+```
+
+Exemplo de saída:
+
+```
+Current machine states:
+
+control-node        running (virtualbox)
+db-node             poweroff (virtualbox)
+```
+
 ## Criação do Ansible Lab
 
 Criação das máquinas Control Node, App01 e Db01:
@@ -214,4 +295,75 @@ Caso você esbarre no problema de ataque *man-in-the-middle*. No é o nosso caso
 ```
 ssh-keygen -f "/home/vagrant/.ssh/known_hosts" -R "db01" # Ou app01
 ssh vagrant@db01 # Ou app01
+```
+
+### Criando os playbooks
+
+**Estrutura dos Playbooks**
+
+```
+ansible-lab/
+├── control-node/
+│   ├── Vagrantfile
+│   ├── provision.sh
+│   ├── playbooks/
+│   │   ├── site.yml
+│   │   ├── webserver.yml
+│   │   └── dbserver.yml
+│   ├── inventory/
+│   │   ├── hosts.ini
+│   │   └── group_vars/
+│   │       ├── all.yml
+│   │       ├── webservers.yml
+│   │       └── dbservers.yml
+│   ├── roles/
+│   │   ├── common/
+│   │   │   ├── tasks/
+│   │   │   │   └── main.yml
+│   │   │   ├── handlers/
+│   │   │   │   └── main.yml
+│   │   │   ├── templates/
+│   │   │   │   └── motd.j2
+│   │   │   ├── files/
+│   │   │   └── vars/
+│   │   │       └── main.yml
+│   │   ├── webserver/
+│   │   │   ├── tasks/
+│   │   │   │   └── main.yml
+│   │   │   └── templates/
+│   │   │       └── index.html.j2
+│   │   └── dbserver/
+│   │       └── tasks/
+│   │           └── main.yml
+│   └── ansible.cfg
+│
+├── app-node/
+│   └── Vagrantfile
+│
+└── db-node/
+    └── Vagrantfile
+```
+
+Procurar no **Ansible Galaxy** roles prontas para instalar o banco MySQL. 
+
+Encontrado `geerlingguy.mysql` -> Seguir a documentação: https://galaxy.ansible.com/ui/standalone/roles/geerlingguy/mysql/install/
+
+Instalar:
+
+```
+ansible-galaxy role install geerlingguy.mysql
+```
+
+Testar execução do playbook com:
+
+```
+ansible-playbook db.yml --check
+```
+
+#### Troubleshotting
+
+Caso encontre problemas de incompatibilidade, considere atualizar a versão do **Ansible**:
+
+```
+pip install --upgrade ansible
 ```

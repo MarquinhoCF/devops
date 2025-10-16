@@ -1,0 +1,9 @@
+- name: Upgrade de todos os pacotes do S. O.
+  apt:
+    upgrade: '*'
+    state: latest
+
+- name: Instalacao do git client
+  apt:
+    name: git
+    state: latest
