@@ -306,36 +306,22 @@ ansible-lab/
 ├── control-node/
 │   ├── Vagrantfile
 │   ├── provision.sh
-│   ├── playbooks/
-│   │   ├── site.yml
-│   │   ├── webserver.yml
-│   │   └── dbserver.yml
-│   ├── inventory/
-│   │   ├── hosts.ini
-│   │   └── group_vars/
-│   │       ├── all.yml
-│   │       ├── webservers.yml
-│   │       └── dbservers.yml
-│   ├── roles/
-│   │   ├── common/
-│   │   │   ├── tasks/
-│   │   │   │   └── main.yml
-│   │   │   ├── handlers/
-│   │   │   │   └── main.yml
-│   │   │   ├── templates/
-│   │   │   │   └── motd.j2
-│   │   │   ├── files/
-│   │   │   └── vars/
-│   │   │       └── main.yml
-│   │   ├── webserver/
-│   │   │   ├── tasks/
-│   │   │   │   └── main.yml
-│   │   │   └── templates/
-│   │   │       └── index.html.j2
-│   │   └── dbserver/
-│   │       └── tasks/
-│   │           └── main.yml
-│   └── ansible.cfg
+│   └── playbooks/
+|       ├── handlers/
+|       ├── roles/
+│       |    └── configuracao-default-so/
+│       |         └── main.yml
+│       |
+|       ├── templates/
+│       |    ├── etc/systemd/system
+│       |    |    └── notes.service
+│       |    └── application.properties
+│       |
+|       ├── vars/
+│       |    └──main.yml
+│       |
+│       ├── app.yml
+│       └── db.yml
 │
 ├── app-node/
 │   └── Vagrantfile
@@ -358,6 +344,23 @@ Testar execução do playbook com:
 
 ```
 ansible-playbook db.yml --check
+ansible-playbook app.yml --check
+```
+
+Ou executar os playbooks com em `dry-run` com `--check` o sistema reclamará de possíveis erros, realize o Troubleshotting se necessário. Ao resolver os problemas execute os playbooks:
+
+```
+ansible-playbook db.yml
+ansible-playbook app.yml
+```
+
+Verificar se a aplicação está no ar:
+
+```
+cd ansible-lab/app01
+vagrant ssh
+service notes status
+ps aux | grep java
 ```
 
 #### Troubleshotting
