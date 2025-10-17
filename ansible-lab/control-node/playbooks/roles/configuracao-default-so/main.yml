@@ -3,7 +3,17 @@
     upgrade: '*'
     state: latest
 
-- name: Instalacao do git client
+- name: Instalacao do Git client
   apt:
     name: git
     state: latest
+
+- name: Configurar hosts do lab Ansible
+  lineinfile: 
+    dest: /etc/hosts
+    state: present
+    line: "{{item}}"
+  with_items:
+    - 192.168.56.10 control-node
+    - 192.168.56.11 app01
+    - 192.168.56.12 db01

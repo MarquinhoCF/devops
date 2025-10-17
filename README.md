@@ -309,16 +309,16 @@ ansible-lab/
 │   └── playbooks/
 |       ├── handlers/
 |       ├── roles/
-│       |    └── configuracao-default-so/
-│       |         └── main.yml
+│       |   └── configuracao-default-so/
+│       |       └── main.yml
 │       |
 |       ├── templates/
-│       |    ├── etc/systemd/system
-│       |    |    └── notes.service
-│       |    └── application.properties
+│       |   ├── etc/systemd/system
+│       |   |   └── notes.service
+│       |   └── application.properties
 │       |
 |       ├── vars/
-│       |    └──main.yml
+│       |   └── main.yml
 │       |
 │       ├── app.yml
 │       └── db.yml
@@ -369,4 +369,34 @@ Caso encontre problemas de incompatibilidade, considere atualizar a versão do *
 
 ```
 pip install --upgrade ansible
+```
+
+### Testando a aplicação
+
+Realizar algumas requisições para testar o funcionamento da aplicação:
+
+#### Cadastro de uma nota:
+
+`note.json`
+```json
+{
+    "title": "Aula de Ansible",
+    "content": "Estudar Ansible amanhã"
+}
+```
+
+```
+curl -H "Content-Type: application/json" --data @note.json http://app01:8080/api/notes
+```
+
+#### Listagem de Notas:
+
+```
+curl http://app01:8080/api/notes
+```
+
+#### Deleção de Notas:
+
+```
+curl -X DELETE -H "Content-Type: application/json" http://app01:8080/api/notes/1
 ```
