@@ -1,6 +1,6 @@
 - name: Upgrade de todos os pacotes do S. O.
   apt:
-    upgrade: '*'
+    upgrade: dist
     state: latest
 
 - name: Instalacao do Git client
