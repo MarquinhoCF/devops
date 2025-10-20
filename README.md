@@ -129,8 +129,8 @@ Criação das máquinas Control Node, App01 e Db01:
 * Db01: MySQL
 
 ```
-mkdir ansible-lab
-cd ansible-lab/
+mkdir 2\ -\ ansible-lab
+cd 2\ -\ ansible-lab/
 mkdir control-node
 mkdir app01
 mkdir db01
@@ -302,7 +302,7 @@ ssh vagrant@db01 # Ou app01
 **Estrutura dos Playbooks**
 
 ```
-ansible-lab/
+2\ -\ ansible-lab/
 ├── control-node/
 │   ├── Vagrantfile
 │   ├── provision.sh
@@ -357,7 +357,7 @@ ansible-playbook app.yml
 Verificar se a aplicação está no ar:
 
 ```
-cd ansible-lab/app01
+cd 2\ -\ ansible-lab/app01
 vagrant ssh
 service notes status
 ps aux | grep java
@@ -399,4 +399,84 @@ curl http://app01:8080/api/notes
 
 ```
 curl -X DELETE -H "Content-Type: application/json" http://app01:8080/api/notes/1
+```
+
+## Criação do Docker Lab
+
+Criação da Máquina Virtual com Docker:
+
+```
+mkdir 2\ -\ ansible-lab
+cd 2\ -\ ansible-lab/
+vargrant init
+```
+
+Configurar o arquivo Vagrant e subir a VM, instalar o Docker. Logo depois verifique com:
+
+```
+vagrant ssh
+docker --version
+docker compose version
+sudo systemctl status docker
+```
+
+### Montagem do Dockerfile
+
+Definir o Dockerfile:
+
+```
+FROM openjdk:8-jdk-alpine
+RUN addgroup -S notes && adduser -S notes -G notes
+USER notes:notes
+ARG JAR_FILE=*.jar
+COPY ${JAR_FILE} easy-note.jar
+COPY application.properties application.properties
+ENTRYPOINT ["java","-jar","/easy-note.jar"]
+```
+
+Copia-lo para dentro da VM com:
+
+```
+vagrant ssh
+sudo su -
+nano Dockerfile
+# Copie o conteúdo do Dockerfile do host para a VM
+```
+
+Copiar o arquivo `JAR` da VM App01 do laboratório de Ansible:
+
+```
+cd 2\ -\ ansible-lab/app01/
+vagrant up
+vagrant ssh-config 
+# Descobrir a porta no caso: 2201
+scp -i "/home/marcos/devops/2 - ansible-lab/app01/.vagrant/machines/default/virtualbox/private_key" -P 2201 vagrant@127.0.0.1:/opt/notes/target/easy-notes-1.0.0.jar .
+# Caso peça a senha a senha é 'vagrant'
+cp easy-notes-1.0.0.jar ../../3\ -\ docker-lab/
+rm easy-notes-1.0.0.jar
+```
+
+Criar o arquivo `application.properties`.
+
+Copiar os arquivos `application.properties` e `easy-notes-1.0.0.jar` para a VM:
+
+```
+vagrant upload application.properties /tmp/
+vagrant upload easy-notes-1.0.0.jar /tmp/easy-note.jar
+sudo cp /tmp/application.properties /root/
+sudo cp /tmp/easy-note.jar /root/
+sudo rm -rf /tmp
+```
+
+Executar e buildar a imagem Docker:
+
+```
+sudo su -
+docker build -t devops/notes .
+```
+
+Verificar a imagem Docker:
+
+```
+docker images
 ```
