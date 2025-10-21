@@ -621,3 +621,85 @@ Para usar o servidor utilize:
 ```
 curl http://localhost:8080/
 ```
+
+#### Utilização do Docker Compose
+
+Docker Compose é uma ferramenta do Docker que permite definir e executar múltiplos containers como um único aplicativo.
+
+Você usa um arquivo chamado docker-compose.yml para descrever:
+
+* quais imagens usar,
+
+* quais portas expor,
+
+* quais volumes montar,
+
+e como os containers se conectam entre si (rede interna automática).
+
+Observe o exemplo abaixo:
+
+```yml
+version: '3'
+services:
+  redis-server:
+    image: "redis"
+  visits-app:
+    build: .
+    ports:
+      - "8080:8081"
+    depends_on:
+      - redis-server
+```
+
+OBS: Perceba que não foi definido uma rede para que os 2 containers se comunicassem. Nesse exemplo a rede é definida automaticamente pelo próprio docker compose:
+
+```
+cd 3\ -\ docker-lab/node-app
+vagrant upload visits-app/docker-compose.yml /tmp/
+vagrant ssh
+sudo su -
+cp /tmp/docker-compose.yml /root/visits-app
+cd /tmp/
+rm docker-compose.yml
+cd ../root/visits-app
+```
+
+Para limpar o ambiente do docker utilize o Docker prune:
+
+```
+docker system prune
+docker volume prune
+```
+
+Subir o ambiente:
+
+```
+docker-compose up
+# Use "-d" para executar em background
+```
+
+Verifique a rede criada automaticamente:
+
+```
+docker network ls
+```
+
+Para destruir e parar os containers utilize:
+
+```
+docker-compose down
+```
+
+### Utilizando Volumes para persistir dados de um container
+
+Testando a criação de um volume. Crie uma instância do Ubuntu 22.04 em modo iterativo passando um diretório como volume:
+
+```
+mkdir upload-images
+docker run -i -t -v /root/upload-images:/upload-images ubuntu:22.04
+cd upload-images/
+touch teste.txt
+exit
+cd upload-images/
+ls # Você verá que o arquivo criado foi persistido no diretório
+```
