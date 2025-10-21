@@ -572,3 +572,52 @@ Verificar a imagem Docker:
 ```
 docker images
 ```
+
+### Exemplo de configuração para aplicação em NodeJS
+
+1. Compilar aplicação NodeJS
+
+2. Conectar NodeJS ao Redis - container apartado
+
+Criar aplicação NodeJS + Redis em `3 - docker-lab/node-app/visits-app`.
+
+Fazer upload dos arquivos para a VM
+
+```
+vagrant upload visits-app/ /tmp
+vagrant ssh
+sudo su -
+cd /tmp
+mkdir /root/visits-app
+cp Dockerfile index.js package.json /root/visits-app/
+rm Dockerfile index.js package.json
+cd /root/visits-app/
+docker build -t devops/visits-app .
+```
+
+E preciso criar uma rede para que o servidor Node se comunique com o Redis:
+
+```
+docker network create devops
+```
+
+Criar os containers com NodeJS e Redis utilizando a rede:
+
+```
+docker run --net devops --name redis-server -d redis
+docker run --net devops -p 8080:8081 -d devops/visits-app
+```
+
+Para verificar se os container estão rodando corretamente:
+
+```
+# Obtenha o id dos containers com:
+docker ps
+docker logs -f <id_da_imagem>
+```
+
+Para usar o servidor utilize:
+
+```
+curl http://localhost:8080/
+```
