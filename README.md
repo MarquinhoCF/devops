@@ -759,3 +759,13 @@ docker service ps demo
 ```
 
 Abrir a página do Nginx (na máquina fisica): http://localhost:8090
+
+Para matar um cluster do Swarm execute em cada nó do cluster (tanto manager quanto workers):
+
+```shell
+# Nos workers:
+docker swarm leave
+
+# No manager:
+docker swarm leave --force # o Force é ncessário para desfazer o cluster se ainda existirem outros nós conectados
+```
