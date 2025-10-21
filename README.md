@@ -528,3 +528,47 @@ Verificar a imagem Docker:
 docker images
 ```
 
+### Como utilizar builds Multiestágio
+
+Para reduzir o tamnho das imagens podemos utilizar o conceito de beuild multi estágio.
+
+Essa técnica consiste em usar várias imagens (estágios) dentro da mesma build, para separar o processo de compilação da aplicação (que precisa de ferramentas como git, maven, gcc, etc) do ambiente de execução final (que precisa apenas do binário/jar pronto).
+
+Para realizar isso crie o Dockerfile:
+
+```
+FROM maven:3.9.9-eclipse-temurin-11 AS buildstage
+RUN mkdir /opt/notes
+WORKDIR /opt/notes
+RUN git clone https://github.com/callicoder/spring-boot-mysql-rest-api-tutorial.git /opt/notes
+RUN mvn package -f /opt/notes/pom.xml -Dmaven.test.skip=true
+
+FROM eclipse-temurin:11-jre-alpine
+RUN addgroup -S notes && adduser -S notes -G notes
+RUN mkdir /opt/notes
+RUN chown -R notes:notes /opt/notes
+USER notes:notes
+WORKDIR /opt/notes
+COPY --from=buildstage /opt/notes/target/easy-notes-1.0.0.jar .
+COPY application.properties application.properties
+ENTRYPOINT ["java","-jar","/opt/notes/easy-notes-1.0.0.jar"]
+```
+
+Executar o Dockerfile na VM:
+
+```
+vagrant ssh
+sudo su -u
+mkdir docker-multi-stage
+cd docker-multi-stage
+cp ../application.properties .
+nano Dockerfile
+# Copiar o conteúdo para o arquivo
+docker build -t devops/notes .
+```
+
+Verificar a imagem Docker:
+
+```
+docker images
+```
