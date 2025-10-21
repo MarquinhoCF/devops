@@ -336,27 +336,27 @@ Encontrado `geerlingguy.mysql` -> Seguir a documentação: https://galaxy.ansibl
 
 Instalar:
 
-```
+```shell
 ansible-galaxy role install geerlingguy.mysql
 ```
 
 Testar execução do playbook com:
 
-```
+```shell
 ansible-playbook db.yml --check
 ansible-playbook app.yml --check
 ```
 
 Ou executar os playbooks com em `dry-run` com `--check` o sistema reclamará de possíveis erros, realize o Troubleshotting se necessário. Ao resolver os problemas execute os playbooks:
 
-```
+```shell
 ansible-playbook db.yml
 ansible-playbook app.yml
 ```
 
 Verificar se a aplicação está no ar:
 
-```
+```shell
 cd 2\ -\ ansible-lab/app01
 vagrant ssh
 service notes status
@@ -367,7 +367,7 @@ ps aux | grep java
 
 Caso encontre problemas de incompatibilidade, considere atualizar a versão do **Ansible**:
 
-```
+```shell
 pip install --upgrade ansible
 ```
 
@@ -385,19 +385,19 @@ Realizar algumas requisições para testar o funcionamento da aplicação:
 }
 ```
 
-```
+```shell
 curl -H "Content-Type: application/json" --data @note.json http://app01:8080/api/notes
 ```
 
 #### Listagem de Notas:
 
-```
+```shell
 curl http://app01:8080/api/notes
 ```
 
 #### Deleção de Notas:
 
-```
+```shell
 curl -X DELETE -H "Content-Type: application/json" http://app01:8080/api/notes/1
 ```
 
@@ -405,7 +405,7 @@ curl -X DELETE -H "Content-Type: application/json" http://app01:8080/api/notes/1
 
 Criação da Máquina Virtual com Docker:
 
-```
+```shell
 mkdir 2\ -\ ansible-lab
 cd 2\ -\ ansible-lab/
 vargrant init
@@ -413,7 +413,7 @@ vargrant init
 
 Configurar o arquivo Vagrant e subir a VM, instalar o Docker. Logo depois verifique com:
 
-```
+```shell
 vagrant ssh
 docker --version
 docker compose version
@@ -424,7 +424,7 @@ sudo systemctl status docker
 
 Definir o Dockerfile:
 
-```
+```Dockerfile
 FROM openjdk:8-jdk-alpine
 RUN addgroup -S notes && adduser -S notes -G notes
 USER notes:notes
@@ -436,7 +436,7 @@ ENTRYPOINT ["java","-jar","/easy-note.jar"]
 
 Copia-lo para dentro da VM com:
 
-```
+```shell
 vagrant ssh
 sudo su -
 nano Dockerfile
@@ -445,7 +445,7 @@ nano Dockerfile
 
 Copiar o arquivo `JAR` da VM App01 do laboratório de Ansible:
 
-```
+```shell
 cd 2\ -\ ansible-lab/app01/
 vagrant up
 vagrant ssh-config 
@@ -460,7 +460,7 @@ Criar o arquivo `application.properties`.
 
 Copiar os arquivos `application.properties` e `easy-notes-1.0.0.jar` para a VM:
 
-```
+```shell
 vagrant upload application.properties /tmp/
 vagrant upload easy-notes-1.0.0.jar /tmp/easy-note.jar
 sudo cp /tmp/application.properties /root/
@@ -470,14 +470,14 @@ sudo rm -rf /tmp
 
 Executar e buildar a imagem Docker:
 
-```
+```shell
 sudo su -
 docker build -t devops/notes .
 ```
 
 Verificar a imagem Docker:
 
-```
+```shell
 docker images
 ```
 
@@ -485,7 +485,7 @@ docker images
 
 Criar o novo Dockerfile:
 
-```
+```Dockerfile
 FROM openjdk:11-jdk-slim
 RUN addgroup --system notes && adduser --system --ingroup notes notes
 RUN apt-get update && apt-get install -y wget tar
@@ -511,7 +511,7 @@ ENTRYPOINT ["java","-jar","/opt/notes/easy-note.jar"]
 
 Executar o Dockerfile na VM:
 
-```
+```shell
 vagrant ssh
 sudo su -u
 mkdir docker-compile
@@ -536,7 +536,7 @@ Essa técnica consiste em usar várias imagens (estágios) dentro da mesma build
 
 Para realizar isso crie o Dockerfile:
 
-```
+```Dockerfile
 FROM maven:3.9.9-eclipse-temurin-11 AS buildstage
 RUN mkdir /opt/notes
 WORKDIR /opt/notes
@@ -556,7 +556,7 @@ ENTRYPOINT ["java","-jar","/opt/notes/easy-notes-1.0.0.jar"]
 
 Executar o Dockerfile na VM:
 
-```
+```shell
 vagrant ssh
 sudo su -u
 mkdir docker-multi-stage
@@ -583,7 +583,7 @@ Criar aplicação NodeJS + Redis em `3 - docker-lab/node-app/visits-app`.
 
 Fazer upload dos arquivos para a VM
 
-```
+```shell
 vagrant upload visits-app/ /tmp
 vagrant ssh
 sudo su -
@@ -597,20 +597,20 @@ docker build -t devops/visits-app .
 
 E preciso criar uma rede para que o servidor Node se comunique com o Redis:
 
-```
+```shell
 docker network create devops
 ```
 
 Criar os containers com NodeJS e Redis utilizando a rede:
 
-```
+```shell
 docker run --net devops --name redis-server -d redis
 docker run --net devops -p 8080:8081 -d devops/visits-app
 ```
 
 Para verificar se os container estão rodando corretamente:
 
-```
+```shell
 # Obtenha o id dos containers com:
 docker ps
 docker logs -f <id_da_imagem>
@@ -653,7 +653,7 @@ services:
 
 OBS: Perceba que não foi definido uma rede para que os 2 containers se comunicassem. Nesse exemplo a rede é definida automaticamente pelo próprio docker compose:
 
-```
+```shell
 cd 3\ -\ docker-lab/node-app
 vagrant upload visits-app/docker-compose.yml /tmp/
 vagrant ssh
@@ -666,27 +666,27 @@ cd ../root/visits-app
 
 Para limpar o ambiente do docker utilize o Docker prune:
 
-```
+```shell
 docker system prune
 docker volume prune
 ```
 
 Subir o ambiente:
 
-```
+```shell
 docker-compose up
 # Use "-d" para executar em background
 ```
 
 Verifique a rede criada automaticamente:
 
-```
+```shell
 docker network ls
 ```
 
 Para destruir e parar os containers utilize:
 
-```
+```shell
 docker-compose down
 ```
 
@@ -694,7 +694,7 @@ docker-compose down
 
 Testando a criação de um volume. Crie uma instância do Ubuntu 22.04 em modo iterativo passando um diretório como volume:
 
-```
+```shell
 mkdir upload-images
 docker run -i -t -v /root/upload-images:/upload-images ubuntu:22.04
 cd upload-images/
@@ -703,3 +703,59 @@ exit
 cd upload-images/
 ls # Você verá que o arquivo criado foi persistido no diretório
 ```
+
+### Introdução ao Docker Swarm - Orquestração de Containers
+
+Vamos montar um cluster Docker Swarm completo, simulando um ambiente real de orquestração distribuída
+
+| Máquina | IP            | Função         | Porta Exposta | Papel no Swarm |
+| ------- | ------------- | -------------- | ------------- | -------------- |
+| manager | 192.168.56.10 | Coordenador    | 80 → 8090     | Manager        |
+| worker1 | 192.168.56.11 | Nó de trabalho | —             | Worker         |
+| worker2 | 192.168.56.12 | Nó de trabalho | —             | Worker         |
+
+Vamos subir o cluster com:
+
+```shell
+cd docker-swarm-lab
+vagrant up
+```
+
+Vamos checar se o cluster foi corretamente criado:
+
+```shell
+vagrant ssh manager
+# Verificar se o manger consegue se comunicar com os workers
+ping 192.168.56.11
+ping 192.168.56.12
+```
+
+Comandos de execução:
+
+```shell
+# Executar no host manager
+docker swarm init --advertise-addr 192.168.56.10
+# Executar nos hosts worker1 e worker2:
+docker swarm join --token <TOKEN> 192.168.56.10:2377
+# Executar no host manager - para listar os nodes do cluster
+docker node ls
+```
+
+Criando um serviço no cluster:
+
+```shell
+# Criar
+docker service create --name demo --publish 80:80 nginx
+
+# Listar serviços criados
+docker service ls
+docker service ps demo
+
+# Escalar o serviço
+docker service scale demo=3
+
+# Visualizar o serviço distribuído pelo cluster
+docker service ps demo
+```
+
+Abrir a página do Nginx (na máquina fisica): http://localhost:8090
