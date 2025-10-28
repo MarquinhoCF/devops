@@ -406,8 +406,8 @@ curl -X DELETE -H "Content-Type: application/json" http://app01:8080/api/notes/1
 Criação da Máquina Virtual com Docker:
 
 ```shell
-mkdir 2\ -\ ansible-lab
-cd 2\ -\ ansible-lab/
+mkdir 3\ -\ docker-lab
+cd 3\ -\ docker-lab/
 vargrant init
 ```
 
@@ -768,4 +768,35 @@ docker swarm leave
 
 # No manager:
 docker swarm leave --force # o Force é ncessário para desfazer o cluster se ainda existirem outros nós conectados
+```
+
+## Criação do SonarQube Lab
+
+Criação da Máquina Virtual com SonarQube:
+
+```shell
+mkdir 4\ -\ sonarqube-lab
+cd 4\ -\ sonarqube-lab/
+vargrant init
+```
+
+Configurar o arquivo Vagrant e subir a VM, instalar o SonarQube. Logo depois verifique com:
+
+```shell
+vagrant ssh
+sudo systemctl status sonarqube
+```
+
+Verificar se o SonarQube está no ar: http://localhost:9000
+
+Verificar se o sonar-scanner está corretamente instalado:
+
+```hell
+sonar-scanner
+```
+
+Verificar se o NodeJS foi instalado corretamente:
+
+```shell
+node -v
 ```

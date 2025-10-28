@@ -1,0 +1,12 @@
+Vagrant.configure("2") do |config|
+  
+  config.vm.box = "ubuntu/focal64"   
+  config.vm.hostname = "sonarqube"
+  config.vm.network "forwarded_port", guest: 9000, host: 9000, host_ip: "127.0.0.1"
+  config.vm.provision "shell", path: "provision.sh"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "3072" # Aloca 3GB de RAM para a VM
+  end
+  config.vbguest.auto_update = false
+
+end
