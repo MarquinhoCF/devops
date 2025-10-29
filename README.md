@@ -940,3 +940,23 @@ pipeline {
     }
 }
 ```
+
+## Integrando o Jenkins ao SonarQube
+
+Primeiramente atualize o Vagrantfile das VM dos laboratórios de Jenkins e SonarQube. Vamos criar uma rede privada para que as VMs possam trocar informações. Adicione a seguinte linha em cada Vagrantfile:
+
+```Vagrantfile
+config.vm.network "private_network", ip: "192.168.56.10" # Jenkins
+
+config.vm.network "private_network", ip: "192.168.56.11" # SonarQube
+```
+
+Depois teste a conexão com cada uma usando `telnet` e passando a porta:
+
+```shell
+# Na VM do SonarQube
+telnet 192.168.56.10 8080
+
+# Na VM do Jenkins
+telnet 192.168.56.11 9000
+``` 
