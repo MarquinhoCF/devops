@@ -783,6 +783,7 @@ vargrant init
 Configurar o arquivo Vagrant e subir a VM, instalar o SonarQube. Logo depois verifique com:
 
 ```shell
+vagrant up
 vagrant ssh
 sudo systemctl status sonarqube
 ```
@@ -833,3 +834,33 @@ sonar-scanner \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.token=<TOKEN>
 ```
+
+## Criação do SonarQube Lab
+
+Criação da Máquina Virtual com SonarQube:
+
+```shell
+mkdir 5\ -\ jenkins-lab
+cd 5\ -\ jenkins-lab
+vargrant init
+```
+
+Configurar o arquivo Vagrant e subir a VM, instalar o Jenkins. Logo depois verifique com:
+
+```shell
+vagrant up
+vagrant ssh
+sudo systemctl status jenkins
+```
+
+Obtendo a senha de admin:
+
+```shell
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+
+Acessar a página web: http://localhost:8080
+
+Colocar a senha de admin e clicar para instalar os plugins sugeridos. Cadastrar as informações básicas.
+
+Testar a criação de Job: Construa um projto free-style e rode um: `echo "Hello World"` 
