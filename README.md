@@ -800,3 +800,36 @@ Verificar se o NodeJS foi instalado corretamente:
 ```shell
 node -v
 ```
+
+### Configurando um Projeto no SonarQube
+
+Entrar na página web: http://localhost:9000. Utilizar o login:
+
+User: admin
+password: admin
+
+Depois de logar será necessário atualizar a senha.
+
+Criar um projeto manualmente. Definir uma chave para o seu projeto. E definir que o análise do projeto será feita localmente. Gerar um token para o projeto.
+
+Copiar o projeto visits-app para a VM:
+
+```shell
+cd ../3\ -\ docker-lab/node-app
+cp -r visits-app ../../4\ -\ sonarqube-lab
+cd ../../4\ -\ sonarqube-lab
+vagrant upload visits-app
+vagrant ssh
+ls # verificar o diretório visits-app
+cd visits-app
+```
+
+Executar o scanner no projeto dentro da VM:
+
+```shell
+sonar-scanner \
+  -Dsonar.projectKey=redis-app \
+  -Dsonar.sources=. \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=<TOKEN>
+```

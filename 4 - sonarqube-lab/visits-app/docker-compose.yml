@@ -1,0 +1,10 @@
+version: '3'
+services:
+  redis-server:
+    image: "redis"
+  visits-app:
+    build: .
+    ports:
+      - "8080:8081"
+    depends_on:
+      - redis-server
