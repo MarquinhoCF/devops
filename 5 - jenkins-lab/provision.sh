@@ -4,7 +4,7 @@ sudo apt-get update -y
 
 ## Instalação do Jenkins
 sudo apt install fontconfig openjdk-21-jre -y
-sudo apt install wget -y
+sudo apt install wget git -y
 sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
   https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
 echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
@@ -38,4 +38,8 @@ sudo systemctl start docker
 sudo systemctl enable docker
 
 echo "Install Docker Compose"
-sudo apt-get install -y docker-compose
+sudo apt-get install docker-compose-plugin -y
+
+# O Jenkins por padrão não pode executar comandos docker, é necessário que se dê permissão para o usuário do Jenkins ter acesso ao socket do Docker:
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins

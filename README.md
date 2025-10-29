@@ -864,3 +864,79 @@ Acessar a página web: http://localhost:8080
 Colocar a senha de admin e clicar para instalar os plugins sugeridos. Cadastrar as informações básicas.
 
 Testar a criação de Job: Construa um projto free-style e rode um: `echo "Hello World"` 
+
+### Criação do repositório com o Redis-App
+
+Crie um novo repositório privado no GitHub.
+
+Crie um novo diretório em sua máquina que será o novo repositório local e copie o projeto `visits-app`:
+
+```shell
+cd ~
+mkdir redis-app
+cd devops/4\ -\ sonarqube-lab/visits-app/
+cp -r ./ ~/redis-app
+```
+
+Suba o código para o repositório remoto, comitando e criando a branch `main`:
+
+```shell
+cd ~/redis-app
+git init
+git add .
+git commit -m "Primeiro commit"
+hit branch -M main
+git remote add origin https://github.com/<USUARIO_GITHUB>/redis-app.git
+git push -u origin main
+```
+
+### Criando a pipeline CI
+
+Criando a pipeline:
+
+1. Criar uma nova tarefa com o nome: redis-app
+
+2. Selecionar `Pipeline`
+
+3. Selecionar que a pipeline será coiada a partir do SCM
+
+4. Passar a URL do repositório remoto
+
+5. Criar uma nova credencial para acesso do repositório
+
+5. Criar o Jenkinsfile no repositório:
+
+```Jenkinsfile
+pipeline {
+    agent any
+
+    stages {
+        stage('Build da imagem Docker') {
+            steps {
+                sh 'docker build -t devops:app .'
+            }
+        }
+        stage('Executar Docker Compose - Redis e App') {
+            steps {
+                sh 'docker compose up --build -d'
+            }
+        }
+        stage('Sleep 10 segundos para aguardar a inicialização') {
+            steps {
+                sleep 10
+            }
+        }
+        stage('Testar a aplicação') {
+            steps {
+                sh 'chmod +x teste-app.sh'
+                sh './teste-app.sh'
+            }
+        }
+        stage('Finalizar containers') {
+            steps {
+                sh 'docker compose down'
+            }
+        }
+    }
+}
+```
