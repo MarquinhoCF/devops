@@ -1,10 +1,31 @@
-# DevOps Studies
+# 📚 DevOps Studies
 
-## Instalar o Oracle VM VirtualBox Manager
+Guia completo de estudos práticos em DevOps, abrangendo virtualização, configuração automatizada, containerização, qualidade de código e integração contínua.
+
+---
+
+## Índice
+
+1. [Configuração Inicial](#-configuração-inicial)
+2. [Laboratório Vagrant](#-laboratório-vagrant)
+3. [Laboratório Ansible](#-laboratório-ansible)
+4. [Laboratório Docker](#-laboratório-docker)
+5. [Laboratório Docker Swarm](#-laboratório-docker-swarm)
+6. [Laboratório SonarQube](#-laboratório-sonarqube)
+7. [Laboratório Jenkins](#-laboratório-jenkins)
+8. [Integração Jenkins + SonarQube](#-integração-jenkins--sonarqube)
+
+---
+
+## Configuração Inicial
+
+### Instalar o Oracle VM VirtualBox Manager
 
 Seguir passo a passo do site: https://www.virtualbox.org/wiki/Downloads
 
-## Explorando Vagrant - Criação do Vagrant Lab
+---
+
+## Laboratório Vagrant
 
 ### Instalação do Vagrant
 
@@ -37,9 +58,9 @@ vagrant ssh
 exit # Para sair da VM
 ```
 
-## 🧰 Comandos principais do Vagrant
+### Comandos principais do Vagrant
 
-### 💤 **1️⃣ Suspender (pausar o estado atual)**
+#### **1. Suspender (pausar o estado atual)**
 
 ```bash
 vagrant suspend
@@ -52,11 +73,9 @@ vagrant suspend
   vagrant resume
   ```
 
-✅ Ideal se você quer **voltar exatamente de onde parou**.
+Ideal se você quer **voltar exatamente de onde parou**.
 
----
-
-### ⚙️ **2️⃣ Desligar (shutdown limpo do SO)**
+##### **2. Desligar (shutdown limpo do SO)**
 
 ```bash
 vagrant halt
@@ -70,11 +89,9 @@ vagrant halt
   vagrant up
   ```
 
-✅ É o jeito mais comum e seguro de **parar uma VM** sem perder nada.
+É o jeito mais comum e seguro de **parar uma VM** sem perder nada.
 
----
-
-### 💣 **3️⃣ Destruir (apagar completamente a VM)**
+##### **3. Destruir (apagar completamente a VM)**
 
 ```bash
 vagrant destroy
@@ -82,11 +99,10 @@ vagrant destroy
 
 * Desliga e **remove completamente** a VM do VirtualBox (ou outro provider).
 * Você perde tudo dentro da VM (mas seus playbooks, arquivos locais etc. continuam na pasta do host).
-  ✅ Use quando quiser **recriar o ambiente do zero**.
 
----
+Use quando quiser **recriar o ambiente do zero**.
 
-### 🧱 **4️⃣ Forçar parada imediata (caso trave)**
+##### **4. Forçar parada imediata (caso trave)**
 
 ```bash
 vagrant halt -f
@@ -101,9 +117,7 @@ vagrant destroy -f
 * **Força** o desligamento sem esperar resposta do sistema.
   ⚠️ Pode corromper o estado se estiver gravando no disco, então use só se a VM travar.
 
----
-
-### 🧩 **5️⃣ Ver o status das VMs**
+#### **5. Ver o status das VMs**
 
 ```bash
 vagrant status
@@ -118,7 +132,9 @@ control-node        running (virtualbox)
 db-node             poweroff (virtualbox)
 ```
 
-## Criação do Ansible Lab
+---
+
+## Laboratório Ansible
 
 Criação das máquinas Control Node, App01 e Db01:
 
@@ -401,7 +417,9 @@ curl http://app01:8080/api/notes
 curl -X DELETE -H "Content-Type: application/json" http://app01:8080/api/notes/1
 ```
 
-## Criação do Docker Lab
+---
+
+## Laboratório Docker
 
 Criação da Máquina Virtual com Docker:
 
@@ -770,7 +788,9 @@ docker swarm leave
 docker swarm leave --force # o Force é ncessário para desfazer o cluster se ainda existirem outros nós conectados
 ```
 
-## Criação do SonarQube Lab
+---
+
+## Laboratório SonarQube
 
 Criação da Máquina Virtual com SonarQube:
 
@@ -835,7 +855,9 @@ sonar-scanner \
   -Dsonar.token=<TOKEN>
 ```
 
-## Criação do SonarQube Lab
+---
+
+## Laboratório Jenkins SonarQube
 
 Criação da Máquina Virtual com SonarQube:
 
@@ -940,6 +962,8 @@ pipeline {
     }
 }
 ```
+
+---
 
 ## Integrando o Jenkins ao SonarQube
 
