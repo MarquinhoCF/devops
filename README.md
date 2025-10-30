@@ -995,3 +995,63 @@ Adicione uma credencial de secret text e coloque o token de o nome de sonar-secr
 nome: sonar-scanner
 SONAR_RUNNER_HOME: /opt/sonar-scanner
 ```
+
+Atualizar o pipeline para incluir o scanner e verificar o Quality Gate:
+
+```Jenkinsfile
+pipeline {
+    agent any
+
+    stages {
+        stage('Build da imagem Docker') {
+            steps {
+                sh 'docker build -t devops:app .'
+            }
+        }
+        stage('Executar Docker Compose - Redis e App') {
+            steps {
+                sh 'docker compose up --build -d'
+            }
+        }
+        stage('Sleep 10 segundos para aguardar a inicialização') {
+            steps {
+                sleep 10
+            }
+        }
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                    scannerHome = tool 'sonar-scanner';
+                }
+                withSonarQubeEnv('sonar-server') {
+                    sh "${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=redis-app \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${env.SONAR_HOST_URL} \
+                        -Dsonar.login=${env.SONAR_AUTH_TOKEN}"
+                }
+            }
+        }
+        stage('Aguardar análise do SonarQube') {
+            steps {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+        stage('Testar a aplicação') {
+            steps {
+                sh 'chmod +x teste-app.sh'
+                sh './teste-app.sh'
+            }
+        }
+        stage('Finalizar containers') {
+            steps {
+                sh 'docker compose down'
+            }
+        }
+    }
+}
+```
+
+### Criando um Quality Gate customizado
+
+É possível criar condições de passagem de qualidade (Quality Gate). Foi necessário criar um Quality Gate para garantir que o código passasse já que não há testes unitários.
