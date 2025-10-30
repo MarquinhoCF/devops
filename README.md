@@ -951,6 +951,8 @@ config.vm.network "private_network", ip: "192.168.56.10" # Jenkins
 config.vm.network "private_network", ip: "192.168.56.11" # SonarQube
 ```
 
+É necessário atualizar o shell script de provisionamento da VM do Jenkins para incluir a instalção do `sonar-scanner` e do `nodejs`.
+
 Depois teste a conexão com cada uma usando `telnet` e passando a porta:
 
 ```shell
@@ -960,3 +962,36 @@ telnet 192.168.56.10 8080
 # Na VM do Jenkins
 telnet 192.168.56.11 9000
 ``` 
+
+Gerar um token de acesso para o Jenkins no SonarQube:
+
+1. Clique no ícone de conta do Sonar
+
+2. Depois vá até a aba de `Security`
+
+3. Gere o token
+
+Depois vá até as configurações do Jenkins:
+
+1. Clique em `System`
+
+2. Vá até a seção `SonarQube servers` e marque a check-box: Environment variables
+
+3. Adicione o servidor do SonarQube:
+
+```
+name: sonar-server
+host: http://192.168.56.11:9000
+Adicione uma credencial de secret text e coloque o token de o nome de sonar-secret
+```
+
+4. Volte uma página e vá até as configurações de `Tools`
+
+5. Adicione uma instalação do Sonar Scanner
+
+6. Desmarque a check-box de instalação automática
+
+```
+nome: sonar-scanner
+SONAR_RUNNER_HOME: /opt/sonar-scanner
+```
