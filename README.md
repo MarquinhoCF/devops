@@ -1,6 +1,6 @@
 # 📚 DevOps Studies
 
-Guia completo de estudos práticos em DevOps, abrangendo virtualização, configuração automatizada, containerização, qualidade de código e integração contínua.
+Guia de estudos práticos em DevOps, abrangendo virtualização, configuração automatizada, containerização, qualidade de código e integração contínua.
 
 ---
 
@@ -1079,3 +1079,15 @@ pipeline {
 ### Criando um Quality Gate customizado
 
 É possível criar condições de passagem de qualidade (Quality Gate). Foi necessário criar um Quality Gate para garantir que o código passasse já que não há testes unitários.
+
+---
+
+## Integrando Jenkins ao Nexus
+
+O Nexus é um repositório de artefatos utilizado principalmente em projetos de desenvolvimento de software para armazenar, gerenciar e distribuir dependências, bibliotecas e pacotes de forma centralizada.
+
+Ele funciona como um repositório local ou remoto para ferramentas de build (como Maven, Gradle ou npm), evitando que cada desenvolvedor precise baixar dependências diretamente da internet e garantindo mais controle, segurança e padronização no uso de versões.
+
+Para isso vamos aumentar a memória RAM da VM com Jenkins e atualizar o script de provisionamento para instalar o Nexus via Docker.
+
+Acessar a página web: http://localhost:8091
