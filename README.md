@@ -1090,4 +1090,125 @@ Ele funciona como um repositório local ou remoto para ferramentas de build (com
 
 Para isso vamos aumentar a memória RAM da VM com Jenkins e atualizar o script de provisionamento para instalar o Nexus via Docker.
 
+```shell
+vagrant reload --provision
+```
+
 Acessar a página web: http://localhost:8091
+
+### Cadastrar um Usuário Sistêmico para o Jenkins no Nexus
+
+Primeiramente devemos fazer o primeiro login no Nexus. Para isso será necessário obtermos a senha:
+
+```shell
+cd 5\ -\ jenkins-lab
+vagrant ssh
+sudo docker exec -it nexus bash
+cat /nexus-data/admin.password
+```
+
+Faça o login: 
+
+user: admin
+
+password: a senha econtrada no `/nexus-data/admin.password`
+
+Atualizar a senha.
+
+No botão de `Settings`: 
+
+1. Criar o usuário para o Jenkins.
+
+2. Adicionar um repositório Docker (docker(hosted))
+    * Criar um serviço HTTP para ele passando a porta `8123`
+
+### Fazer o Teste de Upload de Imagem do Docker no Nenux
+
+Todos jobs criados no Jenkins são armazenados em `/var/lib/jenkins/workspace`. Entrar na tarefa do `redis-app`
+
+```shell
+sudo su -
+cd /var/lib/jenkins/workspace
+cp -r redis-app /root/
+cd /root/redis-app
+docker build -t devops/app .
+docker login -u <USUARIO> -p <SENHA> localhost:8123
+docker tag devops/app:latest localhost:8123/devops/app
+docker push localhost:8123/devops/app
+```
+
+### Integrando o Jenkins ao repositório Docker do Nexus
+
+Vá até `Gerenciar Jenkins`, `System` e `Propriedades Globais` e adicione uma `Variável de Ambiente`: 
+* nome = NEXUS_URL
+* valor = localhost:8123
+
+Vá até `Gerenciar Jenkins`, `Global Credentials` e adicione uma credencial:
+* Username = username que você criou no Nexus
+* Password = senha que você criou no nexus
+* ID = nexus-user
+
+Atualizar o Jenkinsfile:
+
+```Jenkinsfile
+pipeline {
+    agent any
+
+    stages {
+        stage('Build da imagem Docker') {
+            steps {
+                sh 'docker build -t devops:app .'
+            }
+        }
+        stage('Executar Docker Compose - Redis e App') {
+            steps {
+                sh 'docker compose up --build -d'
+            }
+        }
+        stage('Sleep 10 segundos para aguardar a inicialização') {
+            steps {
+                sleep 10
+            }
+        }
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                    scannerHome = tool 'sonar-scanner';
+                }
+                withSonarQubeEnv('sonar-server') {
+                    sh "${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=redis-app \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${env.SONAR_HOST_URL} \
+                        -Dsonar.login=${env.SONAR_AUTH_TOKEN}"
+                }
+            }
+        }
+        stage('Aguardar análise do SonarQube') {
+            steps {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+        stage('Testar a aplicação') {
+            steps {
+                sh 'chmod +x teste-app.sh'
+                sh './teste-app.sh'
+            }
+        }
+        stage('Finalizar containers') {
+            steps {
+                sh 'docker compose down'
+            }
+        }
+        stage('Publicar imagem no Repositório Docker do Nexus') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-user', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    sh 'docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD ${NEXUS_URL}'
+                    sh 'docker tag devops/app:latest ${NEXUS_URL}/devops/app'
+                    sh 'docker push ${NEXUS_URL}/devops/app'
+                }
+            }
+        }
+    }
+}
+```
