@@ -11,10 +11,10 @@ sudo apt update
 sudo apt install -y openjdk-17-jdk unzip wget
 
 # ---------------- Instalação do SonarQube ----------------
-# Faz o download da versão 25.10.0.114319 do SonarQube
-wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-25.10.0.114319.zip
-unzip sonarqube-25.10.0.114319.zip -d /opt/
-sudo mv /opt/sonarqube-25.10.0.114319 /opt/sonarqube
+# Faz o download da versão 9.9.8.100196 do SonarQube
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.8.100196.zip
+unzip sonarqube-9.9.8.100196.zip -d /opt/
+sudo mv /opt/sonarqube-9.9.8.100196 /opt/sonarqube
 
 # Altera o dono da pasta /opt/sonarqube para o usuário e grupo 'sonarqube'
 chown -R sonarqube:sonarqube /opt/sonarqube
@@ -47,14 +47,14 @@ sudo systemctl enable sonarqube
 sudo systemctl start sonarqube
 
 # ---------------- Instalar o SonarScanner ----------------
-# Faz o download e instala o SonarScanner versão 7.3
-wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.3.0.5189-linux-x64.zip
-unzip sonar-scanner-cli-7.3.0.5189-linux-x64.zip -d /opt/
-mv /opt/sonar-scanner-7.3.0.5189-linux-x64 /opt/sonar-scanner
-chown -R sonarqube:sonarqube /opt/sonar-scanner
+# Faz o download e instala o SonarScanner versão 6.2
+wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.0.4584-linux-x64.zip
+unzip sonar-scanner-cli-6.2.0.4584-linux-x64.zip -d /opt/
+mv /opt/sonar-scanner-6.2.0.4584-linux-x64 /opt/sonar-scanner
+chown -R jenkins:jenkins /opt/sonar-scanner
 echo 'export PATH=$PATH:/opt/sonar-scanner/bin' | sudo tee -a /etc/profile
 
-# ---------------- Instalar Node.js (via NVM) ----------------
-# Instala o NVM (Node Version Manager) e depois instala a versão 10 do Node.js
-curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+# ---------------- Instalar Node.js ----------------
+# Instala a versão 18 do Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs

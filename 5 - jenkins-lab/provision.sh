@@ -43,3 +43,17 @@ sudo apt-get install docker-compose-plugin -y
 # O Jenkins por padrão não pode executar comandos docker, é necessário que se dê permissão para o usuário do Jenkins ter acesso ao socket do Docker:
 sudo usermod -aG docker jenkins
 sudo systemctl restart jenkins
+
+# ---------------- Instalar o SonarScanner ----------------
+# Faz o download e instala o SonarScanner versão 6.2
+sudo apt install -y unzip wget
+wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.0.4584-linux-x64.zip
+unzip sonar-scanner-cli-6.2.0.4584-linux-x64.zip -d /opt/
+mv /opt/sonar-scanner-6.2.0.4584-linux-x64 /opt/sonar-scanner
+chown -R jenkins:jenkins /opt/sonar-scanner
+echo 'export PATH=$PATH:/opt/sonar-scanner/bin' | sudo tee -a /etc/profile
+
+# ---------------- Instalar Node.js (via NVM) ----------------
+# Instala a versão 10 do Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
